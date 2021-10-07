@@ -1,79 +1,54 @@
-// new CountdownTimer({
-//   selector: '#timer-1',
-//   targetDate: new Date('Jul 17, 2019'),
-// });
 
-const refs = {
-     clockface: document.getElementById('timer-1'),
-}
+import refs from './refs/refs.js'
+const animationTime = document.querySelector('.timer')
 
-  class Timer {
-  constructor({ onTick }) {
-    this.intervalId = null;
-    this.isActive = false;
-    this.onTick = onTick;
 
-    this.init();
+class CountdownTimer {
+  constructor({ selector, targetDate}) {
+    this.selector = selector
+    this.targetDate = targetDate
+    this.initID = null
+    this.deltaTime = 0
   }
-
-  init() {
-    const time = this.getTimeComponents(0);
-    this.onTick(time);
-  }
-
   start() {
-    if (this.isActive) {
-      return;
-    }
-
-    const startTime = new Date('Jul 17, 2019')
-    this.isActive = true;
-
-    this.intervalId = setInterval(() => {
-      const currentTime = Date.now();
-      const deltaTime = startTime - currentTime;
-      const time = this.getTimeComponents(deltaTime);
-
-      this.onTick(time);
-    }, 1000);
-
+      this.initID = setInterval(() => {
+      let currentTime = Date.now()
+      this.deltaTime = this.targetDate - currentTime
+        const time = this.getTimeComponents(this.deltaTime);
+        this.insertValues(time)
+        this.animateDate(time)
+      }, 1000)
   }
-
   stop() {
-    clearInterval(this.intervalId);
-    this.isActive = false;
-    const time = this.getTimeComponents(0);
-    this.onTick(time);
+    clearInterval(this.initID)
   }
-
-  /*
-   * - Принимает время в миллисекундах
-   * - Высчитывает сколько в них вмещается часов/минут/секунд
-   * - Возвращает обьект со свойствами hours, mins, secs
-   * - Адская копипаста со стека 💩
-   */
-  getTimeComponents(time) {
-    const hours = this.pad(
-      Math.floor((time % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-    );
+   getTimeComponents(time) {
+    const days = this.pad(Math.floor(time / (1000 * 60 * 60 * 24)));
+    const hours = this.pad(Math.floor((time % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
     const mins = this.pad(Math.floor((time % (1000 * 60 * 60)) / (1000 * 60)));
     const secs = this.pad(Math.floor((time % (1000 * 60)) / 1000));
-
-    return { hours, mins, secs };
+    return { days, hours, mins, secs };
   }
-
-  /*
-   * Принимает число, приводит к строке и добавляет в начало 0 если число меньше 2-х знаков
-   */
   pad(value) {
-    return String(value).padStart(2, '0');
+    return String(value).padStart(2, '0')
+  }
+  insertValues({ days, hours, mins, secs }) {
+    refs.days.textContent = days;
+    refs.hours.textContent = hours;
+    refs.mins.textContent = mins;
+    refs.seconds.textContent = secs;
+  }
+  animateDate({ secs }) {
+    if (secs === '00') {
+      animationTime.classList.add('animate__animated', 'animate__flipInX')
+    } else if (!(secs === '00')) {
+      animationTime.classList.remove('animate__animated', 'animate__fflipInX')
+    }
   }
 }
 
-const timer = new Timer({
-    onTick: updateClockface,
+const myTimer = new CountdownTimer({
+  selector: '#timer-1',
+  targetDate: new Date('Nov 21, 2021'),
 });
-
-function updateClockface({ hours, mins, secs }) {
-  refs.clockface.textContent = `${hours}:${mins}:${secs}`;
-}
+myTimer.start()
