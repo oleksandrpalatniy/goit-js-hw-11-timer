@@ -1,14 +1,16 @@
 
-import refs from './refs/refs.js'
-const animationTime = document.querySelector('.timer')
-
-
 class CountdownTimer {
   constructor({ selector, targetDate}) {
-    this.selector = selector
+    this.selector = document.querySelector(selector)
     this.targetDate = targetDate
     this.initID = null
     this.deltaTime = 0
+
+    this.animationTime = document.querySelector('.timer')
+    this.days = this.selector.querySelector('[data-value="days"]'),
+    this.hours = this.selector.querySelector('[data-value="hours"]'),
+    this.mins = this.selector.querySelector('[data-value="mins"]'),
+    this.seconds = this.selector.querySelector('[data-value="secs"]')
   }
   start() {
       this.initID = setInterval(() => {
@@ -33,16 +35,16 @@ class CountdownTimer {
     return String(value).padStart(2, '0')
   }
   insertValues({ days, hours, mins, secs }) {
-    refs.days.textContent = days;
-    refs.hours.textContent = hours;
-    refs.mins.textContent = mins;
-    refs.seconds.textContent = secs;
+    this.days.textContent = days;
+    this.hours.textContent = hours;
+    this.mins.textContent = mins;
+    this.seconds.textContent = secs;
   }
   animateDate({ secs }) {
     if (secs === '00') {
-      animationTime.classList.add('animate__animated', 'animate__flipInX')
+      this.animationTime.classList.add('animate__animated', 'animate__flipInX')
     } else if (!(secs === '00')) {
-      animationTime.classList.remove('animate__animated', 'animate__fflipInX')
+      this.animationTime.classList.remove('animate__animated', 'animate__fflipInX')
     }
   }
 }
